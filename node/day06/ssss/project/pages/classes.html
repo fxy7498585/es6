@@ -1,0 +1,30 @@
+<h3>所有班级信息</h3>
+<hr>
+
+<table>
+    <tbody>
+        <tr>
+            <th>编号</th>
+            <th>班级名称</th>
+            <th>操作</th>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(function(){
+        $.getJSON('http://localhost:8080/classes',function(data){
+            data.forEach(function(item) {
+                var newTr = '<tr>'
+                    +'<td><input type="checkbox" value="'+item.id+'"></td>'
+                    +'<td>'+item.name+'</td>'
+                    +'<td>'
+                        +'<a href="">删除</a>'
+                        +'<a href="">修改</a>'
+                    +'</td>'
+                +'</tr>';
+                $('tbody').append(newTr);
+            }, this);
+        })
+    })
+</script>

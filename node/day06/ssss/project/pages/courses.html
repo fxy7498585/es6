@@ -1,0 +1,31 @@
+<h3>课程信息系统</h3>
+<hr>
+<table>
+    <tbody>
+        <tr>
+            <th>编号</th>
+            <th>姓名</th>
+            <th>学分</th>
+            <th>操作</th>
+        </tr>
+    </tbody>
+</table>
+<script>
+    $(function(){
+        $.getJSON('http://localhost:8080/courses',function(data){
+            console.log(data);
+            data.forEach(function(item){
+                var newTr = '<tr>'
+            +'<td><input type="checkbox" value="'+item.id+'"></td>'
+            +'<td>'+item.name+'</td>'
+            +'<td>'+item.credit+'</td>'
+            +'<td>'
+                +'<a href="">删除</a>'
+                +'<a href="">修改</a>'
+            +'</td>'
+        +'</tr>'
+        $('tbody').append(newTr);
+            });
+        });
+    });
+</script>
