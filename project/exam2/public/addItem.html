@@ -1,0 +1,419 @@
+<div class="addItem">
+	<div class="close"><button>×</button></div>
+	<div class="subjectOptions">
+		<span>类型</span>
+		<select name="type" id="type1">
+			<!-- <option value="单选题">单选题</option>
+			<option value="复选题">复选题</option>
+			<option value="简答题">简答题</option> -->
+		</select>
+		<span>难易程度</span>
+		<select name="complexity" id="complexity1">
+			<!-- <option value="简单">简单</option>
+			<option value="中等">中等</option>
+			<option value="难">难</option> -->
+		</select>
+		<span>方向</span>
+		<select name="direction" id="direction1">
+			<!-- <option value="WebUI">WebUI</option>
+			<option value="javaEE">javaEE</option>
+			<option value="大数据">大数据</option>
+			<option value="安卓">安卓</option>
+			<option value="php">php</option>
+			<option value="ios">ios</option> -->
+		</select>
+		<span>知识点</span>
+		<select name="knowledge" id="knowledge1">
+			<!-- <option value="html">html</option>
+			<option value="javascript">javascript</option>
+			<option value="css">css</option>
+			<option value="jquery">jquery</option>
+			<option value="bootstrap">bootstrap</option>
+			<option value="coreJava">coreJava</option>
+			<option value="xml">xml</option>
+			<option value="servlet/jsp">servlet/jsp</option> -->
+		</select>
+		<!-- <button id="btn">点击添加题目</button> -->
+	</div>
+	<div class="additem_contents">
+		<!-- 题干 -->
+		<div class="question_stem">
+			<span>题目题干</span>
+			<textarea name="question_stem_content" id="" cols="30" rows="10">
+				
+			</textarea>
+		</div>
+		<!-- 选项 -->
+		<div id="addBtn_item">
+			<button id="addBtn">添加选项</button>
+			<div class="answer_option" id="answer_option">
+				
+				<div class="items" id="items">
+					<div>
+						<span></span>
+						<label for=""><input type="radio" name="item"></label>
+					</div>
+					<textarea name="" id="" cols="30" rows="10">
+						
+					</textarea>
+				</div>
+				<div class="items" id="items">
+					<div>
+						<span></span>
+						<label for=""><input type="radio" name="item"></label>
+					</div>
+					<textarea name="" id="" cols="30" rows="10">
+						
+					</textarea>
+				</div>
+				<div class="items" id="items">
+					<div>
+						<span></span>
+						<label for=""><input type="radio" name="item"></label>
+					</div>
+					<textarea name="" id="" cols="30" rows="10">
+						
+					</textarea>
+				</div>
+				<div class="items" id="items">
+					<div>
+						<span></span>
+						<label for=""><input type="radio" name="item"></label>
+					</div>
+					<textarea name="" id="" cols="30" rows="10">
+						
+					</textarea>
+				</div>
+
+			</div>
+		</div>
+		<!-- 简答题 -->
+		<!-- 答案 -->
+		<div class="answer">
+			<span>答案</span>
+			<textarea name="answer_text" id="answer_text" cols="30" rows="10">	
+			</textarea>
+		</div>
+
+		<!--保存  -->
+		<div class="save">
+			<button>保存并继续</button>
+			<button>保存并关闭</button>
+		</div>
+	</div>
+</div>
+<!-- <script type="text/javascript" src="./js/jquery.min.js"></script> -->
+<script type="text/javascript">
+	$(function(){
+		//题目
+		var stem,whoItem,whosItem,jdAnswer;
+		// select框数组
+		var valArr=[];
+		//每个选项的内容
+		var answerArr=[]
+		items=['A','B','C','D','E','F','G','H'];
+		//ly
+		get("#type1","findAllType","realName");
+		get("#complexity1","findAllComplexity","realName");
+		get("#direction1","findAllDirection","name");
+		get("#knowledge1","findAllKnowledge","title");		
+		// $('#answer_option>div:nth-child(1) span:eq(0)').text('A');
+		for(var i=0;i<$('#answer_option>div').length;i++){
+			$('#answer_option>div:nth-child('+(i+1)+') span:eq(0)').text(items[i]);
+		}
+		cloneClick();
+		closeClick();
+		changeSelect('#type1');
+		getVal("#type1",valArr,0);
+		getVal("#complexity1",valArr,1);
+		getVal("#direction1",valArr,2);
+		getVal("#knowledge1",valArr,3);
+		btnSubmit(answerArr,valArr,stem);
+		$('.answer').hide();
+
+	});
+	//获取select 选项内容
+	function get(id,adress,type){
+		$.getJSON('http://localhost:3000/exam/manager/'+adress,function(data){
+			var select=$(id);
+			var html='';
+			data.forEach(function(item){
+				html+='<option value="'+item.id+'" title="'+item.id+'">'+item[type]+'</option>'
+			});
+			select.html(html);
+		});
+	}
+
+	//提交并获取选项内容
+	function btnSubmit(answerArr,valArr,stem){
+		$('.save button:eq(0)').on('click',function(){
+			//题目
+			stem=$('.question_stem textarea').val().trim();
+			console.log($('#answer_option>div').length);
+			for(var i=0;i<$('#answer_option>div').length;i++){
+				answerArr[i]=$('#answer_option>div:nth-child('+(i+1)+') textarea').val().trim();
+			}
+			getAnswer(valArr);
+			if(valArr[0]==='1'&&whoItem!=''&&answerArr!=''&&stem!=''&&valArr.length===4){
+				$.get('http://localhost:3000/exam/manager/addItem',{
+					analysis:whoItem,
+					answer:answerArr,
+					stem:stem,
+					department_id:valArr[2],
+					subjectLevel_id:valArr[1],
+					subjectType_id:valArr[0],
+					topic_id:valArr[3]
+				},function(data){
+					alert('添加成功');
+				})
+			}else if(valArr[0]==='2'&&whosItem!=''&&answerArr!=''&&stem!=''&&valArr.length===4){
+				$.get('http://localhost:3000/exam/manager/addItem',{
+					analysis:whosItem,
+					answer:answerArr,
+					stem:stem,
+					department_id:valArr[2],
+					subjectLevel_id:valArr[1],
+					subjectType_id:valArr[0],
+					topic_id:valArr[3]
+				},function(data){
+					alert('添加成功');
+				})
+			}else if(valArr[0]==='3'&&jdAnswer!=''&&answerArr!=''&&stem!=''&&valArr.length===4){
+				$.get('http://localhost:3000/exam/manager/addItem',{
+					analysis:jdAnswer,
+					answer:jdAnswer,
+					stem:stem,
+					department_id:valArr[2],
+					subjectLevel_id:valArr[1],
+					subjectType_id:valArr[0],
+					topic_id:valArr[3]
+				},function(data){
+					alert('添加成功');
+				})
+			}else{
+				alert('请输入完整数据');
+			}
+
+			// console.log(whoItem);
+			// console.log(whosItem);
+			// console.log(jdAnswer);
+			console.log(stem);
+			console.log(answerArr);
+			console.log(valArr);
+			contentEmpty();
+			
+		});
+	}
+	//点击之后内容框里面的内容清空
+	function contentEmpty(){
+		for(var i=0;i<$('#answer_option>div').length;i++){
+			$('#answer_option>div:nth-child('+(i+1)+') textarea').val('');
+		}
+		$('.question_stem textarea').val('');
+	}
+	//获取答案
+	function getAnswer(valArr){
+		console.log(valArr);
+		if(valArr[0]==='1'){
+			$('#items input').change(function(){
+				whoItem=$('input:radio:checked').parent('label').siblings('span').text();
+				console.log(whoItem);
+			});
+		}else if(valArr[0]==='2'){
+			$('#items input').change(function(){
+				whosItem=$('input:checkbox:checked').parent('label').siblings('span').text().split('').join();
+				console.log(whosItem);
+			});
+		}else{
+			$('.answer textarea').keyup(function(){
+				jdAnswer=$(this).val().trim();
+				console.log(jdAnswer);
+			});
+		}
+	}
+	//
+	//获取val添加到数组 ly
+	function getVal(id,valArr,i){
+		$(id).on('click',function(){
+			valArr[i]=$(id).val();
+			getAnswer(valArr);
+		});
+
+	}
+	//改变select数据改变
+	function changeSelect(id){
+		$(id).change(function(){
+			$(this).val()==='3'?$('#addBtn_item').hide():($(this).val()==='1'?$('#addBtn_item').show():$('#items input').attr('type','checkbox'));
+			$(this).val()==='1'?$('#items input').attr('type','radio'):($(this).val()==='2'?$('#addBtn_item').show():1);
+			$(this).val()==='1'?$('.answer').hide():($(this).val()==='2'?$('.answer').hide():$('.answer').show());
+
+		});
+	}
+
+	//close点击关闭
+	function closeClick(){
+		$('.close>button').on('click',function(){
+			$('#content_contents').children().hide();
+			location.reload();
+		});
+	}
+
+	//点击克隆
+	function cloneClick(){
+		$('#addBtn').on('click',function(){
+			$('#answer_option').append($('#items').clone(true));
+			for(var i=0;i<$('#answer_option').children('div').length;i++){
+				$('#answer_option>div:nth-child('+(i+1)+') span:eq(0)').text(items[i]);
+			}
+		});
+	}
+
+
+</script>
+
+
+<style>
+	.subjectOptions{
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding:20px;
+		border-bottom: 3px solid green;
+	}
+	.subjectOptions select{
+		width: 100px;
+		height: 40px;
+		border:none;
+		border:1px solid gray;
+		border-radius: 5px;
+		background: #fff;
+		margin-left:10px;
+		font-size: 16px;
+	}
+	.subjectOptions select option{
+		display: inline-block;
+		width: 100px;
+		height: 50px;
+	}
+	.subjectOptions span{
+		color:#fff;
+		margin-left: 20px;
+	}
+	.subjectOptions button{
+		width: 100px;
+		height: 40px;
+		border-radius: 5px;
+		background: #fff;
+		cursor: pointer;
+		margin-left: 20px;
+		font-size: 16px;
+	}
+	.addItem .close button{
+		display:flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		width: 40px;
+		height: 40px;
+		background: gray;
+		font-size: 35px;
+		border-radius: 5px;
+		float: right;
+	}
+	.additem_contents{
+		display: flex;
+		flex-direction: column;
+		background: #fff;
+		padding:20px 20px;
+	}
+	.additem_contents button{
+		margin-top: 20px;
+		width: 100px;height: 40px;border-radius: 5px;
+	}
+
+	/* question_stem */
+
+	.additem_contents .question_stem{
+		display:flex;
+		flex-direction:column;
+		align-items: flex-start;
+	}
+	.additem_contents .question_stem span{
+		font-weight: bold;
+		color:blue;
+		padding: 10px 0px;
+	}
+	.additem_contents .question_stem textarea{
+		width: 95%;
+		height: 100px;
+		resize:none;
+	}
+
+	/*answer_option*/
+
+	.additem_contents .answer_option{
+		display: flex;
+		flex-direction: column;
+		margin-top: 20px;
+	}
+	.additem_contents .answer_option .items{
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		padding:10px 0px;
+	}
+	.additem_contents .answer_option .items>div{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width:40px;
+	}
+	.additem_contents .answer_option .items>div span{
+		display:flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		width: 40px;
+		height: 40px;
+		background:blue;
+	}
+	.additem_contents .answer_option .items>div label{
+		display:flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		width: 40px;
+		flex:1;
+		background: skyblue;
+	}
+	.additem_contents .answer_option .items>div label>input{
+		width: 20px;
+		height: 20px;
+	}
+	.additem_contents .answer_option .items>textarea{
+		width:30%;
+		height: 100px;
+		resize:none;
+	}
+	.additem_contents .answer{
+		display: flex;
+		flex-direction:column;
+
+	}
+	.additem_contents .answer span{
+		font-weight: bold;
+		color:blue;
+		padding: 10px 0px;
+	}
+	.additem_contents .answer textarea{
+		width:95%;
+		height: 100px;
+		resize:none;
+	}
+	.additem_contents .save{
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		margin-bottom: 100px;
+	}
+</style>
